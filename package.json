@@ -1,0 +1,68 @@
+{
+    "name": "themeshift",
+    "displayName": "ThemeShift",
+    "description": "Schedule theme changes during the day.",
+    "version": "0.0.1",
+    "publisher": "kjudson",
+    "engines": {
+        "vscode": "^1.14.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "configuration": {
+            "title": "ThemeShift",
+            "properties": {
+                "themeshift.sunset": {
+                    "type": "string",
+                    "default": "18:00",
+                    "description": "When the sun goes down"
+                },
+                "themeshift.sunrise": {
+                    "type": "string",
+                    "default": "07:00",
+                    "description": "When the sun comes up"
+                },
+                "themeshift.daytheme": {
+                    "type": "string",
+                    "default": "Default Light+",
+                    "description": "Theme to set for daytime"
+                },
+                "themeshift.nighttheme": {
+                    "type": "string",
+                    "default": "Default Dark+",
+                    "description": "Theme to set for nights"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "extension.changetheme",
+                "title": "ThemeShift"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "eslint": "^3.6.0",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    },
+    "dependencies": {
+        "moment": "^2.18.1"
+    },
+    "author": {
+        "name": "Kevin Judson"
+    }
+}
