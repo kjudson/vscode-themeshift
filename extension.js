@@ -10,7 +10,7 @@ let realSunset;
 let timerId;
 
 function activate(context) {
-  reset();
+  restart();
 
   vscode.workspace.onDidChangeConfiguration(event => {
     const newConfig = getConfig().get("themeshift");
@@ -18,7 +18,7 @@ function activate(context) {
       return config[entry[0]] !== entry[1];
     });
     if (changedConfigs.length > 0) {
-      reset();
+      restart();
     }
   });
 }
@@ -29,14 +29,17 @@ function deactivate() {
 }
 exports.deactivate = deactivate;
 
+function restart() {
+  reset();
+  startPolling();
+}
+
 function reset() {
   config = getConfig().get("themeshift");
   clearInterval(timerId);
   lastCoordinatesUpdate = 0;
   realSunrise = realSunset = undefined;
   timerId = undefined;
-
-  startPolling();
 }
 
 function startPolling() {
