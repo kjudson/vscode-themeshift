@@ -2,7 +2,7 @@ const vscode = require("vscode");
 const moment = require("moment");
 const fetch = require("node-fetch");
 
-const updateFrequency = 1000;
+const updateFrequency = 60000;
 let config = {};
 let lastCoordinatesUpdate = 0;
 let realSunrise;
