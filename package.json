@@ -64,7 +64,8 @@
         "@types/mocha": "^2.2.32"
     },
     "dependencies": {
-        "moment": "^2.18.1"
+        "moment": "^2.18.1",
+        "node-fetch": "^1.7.1"
     },
     "author": {
         "name": "Kevin Judson"

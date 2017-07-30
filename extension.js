@@ -1,40 +1,133 @@
 const vscode = require("vscode");
 const moment = require("moment");
+const fetch = require("node-fetch");
 
 const updateFrequency = 60000;
+let config = {};
+let lastCoordinatesUpdate = 0;
+let realSunrise;
+let realSunset;
 let timerId;
 
 function activate(context) {
-  timerId = setInterval(function() {
-    const config = getConfig();
-    const sunrise = config.get("themeshift.sunrise");
-    const sunset = config.get("themeshift.sunset");
-    const dayTheme = config.get("themeshift.daytheme");
-    const nightTheme = config.get("themeshift.nighttheme");
-    if (
-      moment(sunrise, "HH:mm").isAfter() || moment(sunset, "HH:mm").isBefore()
-    ) {
-      updateTheme(config, nightTheme);
-    } else {
-      updateTheme(config, dayTheme);
+  reset();
+
+  vscode.workspace.onDidChangeConfiguration(event => {
+    const newConfig = getConfig().get("themeshift");
+    const changedConfigs = Object.entries(newConfig).filter(entry => {
+      return config[entry[0]] !== entry[1];
+    });
+    if (changedConfigs.length > 0) {
+      reset();
     }
-  }, updateFrequency);
+  });
 }
 exports.activate = activate;
 
 function deactivate() {
-  clearInterval(timerId);
+  reset();
 }
 exports.deactivate = deactivate;
+
+function reset() {
+  config = getConfig().get("themeshift");
+  clearInterval(timerId);
+  lastCoordinatesUpdate = 0;
+  realSunrise = realSunset = undefined;
+  timerId = undefined;
+
+  startPolling();
+}
+
+function startPolling() {
+  timerId = setInterval(checkTheme, updateFrequency);
+}
 
 function getConfig() {
   return vscode.workspace.getConfiguration();
 }
 
-function updateTheme(config, newTheme) {
-  const currentTheme = config.get("workbench.colorTheme");
+function checkTheme() {
+  getSunriseSunset(config).then(result => {
+    const { sunrise, sunset } = result;
+    if (
+      moment(sunrise, "HH:mm").isAfter() || moment(sunset, "HH:mm").isBefore()
+    ) {
+      updateTheme(config.nighttheme);
+    } else {
+      updateTheme(config.daytheme);
+    }
+  });
+}
+
+function updateTheme(newTheme) {
+  const wsConfig = getConfig();
+  const currentTheme = wsConfig.get("workbench.colorTheme");
   if (newTheme !== currentTheme) {
     console.log(`Shifting to ${newTheme}`);
-    config.update("workbench.colorTheme", newTheme, true);
+    wsConfig.update("workbench.colorTheme", newTheme, true);
   }
+}
+
+function getSunriseSunset(config) {
+  const sunrise = config.sunrise;
+  const sunset = config.sunset;
+  if (sunrise === "auto" || sunset === "auto") {
+    return getAndUpdateSunriseSunset().then(result => {
+      return {
+        sunrise: sunrise === "auto" ? realSunrise : sunrise,
+        sunset: sunset === "auto" ? realSunset : sunset
+      };
+    });
+  } else {
+    return Promise.resolve({ sunrise, sunset });
+  }
+}
+
+function getAndUpdateSunriseSunset() {
+  if (Date.now() - lastCoordinatesUpdate > 60 * 60 * 1000) {
+    lastCoordinatesUpdate = Date.now();
+    return getCoordinates()
+      .then(getSunriseSunsetFromWebService)
+      .then(result => {
+        realSunrise = moment(result.sunrise, "hh:mm:ss A").format("HH:mm");
+        realSunset = moment(result.sunset, "hh:mm:ss A").format("HH:mm");
+        return {
+          sunrise: realSunrise,
+          sunset: realSunset
+        };
+      })
+      .catch(error => {
+        console.error("Error getting sunrise/sunset information: " + error);
+      });
+  } else {
+    return Promise.resolve({
+      sunrise: realSunrise || config.sunrise,
+      sunset: realSunset || config.sunset
+    });
+  }
+}
+
+function getCoordinates() {
+  return fetch("http://ip-api.com/json")
+    .then(result => {
+      return result.json();
+    })
+    .then(json => {
+      return {
+        lat: json.lat,
+        lon: json.lon
+      };
+    });
+}
+
+function getSunriseSunsetFromWebService(coordinates) {
+  const { lat, lon } = coordinates;
+  return fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lon}`)
+    .then(result => {
+      return result.json();
+    })
+    .then(json => {
+      return json.results;
+    });
 }
