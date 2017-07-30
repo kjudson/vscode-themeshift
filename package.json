@@ -46,8 +46,12 @@
         },
         "commands": [
             {
-                "command": "extension.changetheme",
-                "title": "ThemeShift"
+                "command": "extension.dayshift",
+                "title": "ThemeShift: Shift to Day Theme"
+            },
+            {
+                "command": "extension.nightshift",
+                "title": "ThemeShift: Shift to Night Theme"
             }
         ]
     },

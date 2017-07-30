@@ -2,12 +2,14 @@ const vscode = require("vscode");
 const moment = require("moment");
 const fetch = require("node-fetch");
 
-const updateFrequency = 60000;
+const updateFrequency = 1000;
 let config = {};
 let lastCoordinatesUpdate = 0;
 let realSunrise;
 let realSunset;
 let timerId;
+let manualShiftTimestamp = 0;
+let manualShifted = false;
 
 function activate(context) {
   restart();
@@ -21,6 +23,14 @@ function activate(context) {
       restart();
     }
   });
+
+  vscode.commands.registerCommand("extension.dayshift", () => {
+    manualShift(config.daytheme);
+  });
+
+  vscode.commands.registerCommand("extension.nightshift", () => {
+    manualShift(config.nighttheme);
+  });
 }
 exports.activate = activate;
 
@@ -28,6 +38,12 @@ function deactivate() {
   reset();
 }
 exports.deactivate = deactivate;
+
+function manualShift(theme) {
+  updateTheme(theme);
+  manualShiftTimestamp = Date.now();
+  manualShifted = true;
+}
 
 function restart() {
   reset();
@@ -40,6 +56,8 @@ function reset() {
   lastCoordinatesUpdate = 0;
   realSunrise = realSunset = undefined;
   timerId = undefined;
+  manualShifted = false;
+  manualShiftTimestamp = 0;
 }
 
 function startPolling() {
@@ -52,13 +70,28 @@ function getConfig() {
 
 function checkTheme() {
   getSunriseSunset(config).then(result => {
+    const shiftMoment = moment(manualShiftTimestamp);
     const { sunrise, sunset } = result;
-    if (
-      moment(sunrise, "HH:mm").isAfter() || moment(sunset, "HH:mm").isBefore()
-    ) {
-      updateTheme(config.nighttheme);
-    } else {
-      updateTheme(config.daytheme);
+    const sunriseMoment = moment(sunrise, "HH:mm");
+    const sunsetMoment = moment(sunset, "HH:mm");
+
+    if (manualShifted && shiftMoment.dayOfYear() < moment().dayOfYear()) {
+      manualShiftTimestamp = null;
+      manualShifted = false;
+    }
+
+    if (sunriseMoment.isAfter()) {
+      if (!manualShifted) {
+        updateTheme(config.nighttheme);
+      }
+    } else if (sunriseMoment.isBefore() && sunsetMoment.isAfter()) {
+      if (!manualShift || shiftMoment.isBefore(sunriseMoment)) {
+        updateTheme(config.daytheme);
+      }
+    } else if (sunsetMoment.isBefore()) {
+      if (!manualShift || shiftMoment.isBefore(sunsetMoment)) {
+        updateTheme(config.nighttheme);
+      }
     }
   });
 }
