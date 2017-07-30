@@ -13,4 +13,5 @@ Configurations you'll want to amend:
 # Acknowledgements
 - Sunrise and sunset information is provided by [Sunrise-Sunset](https://sunrise-sunset.org/).
 - Location information is provided by [IP-API.com](http://ip-api.com/).
-- 
+
+
