@@ -61,6 +61,7 @@ function reset() {
 }
 
 function startPolling() {
+  setTimeout(checkTheme, 5000);
   timerId = setInterval(checkTheme, updateFrequency);
 }
 
@@ -80,18 +81,19 @@ function checkTheme() {
       manualShifted = false;
     }
 
-    if (sunriseMoment.isAfter()) {
-      if (!manualShifted) {
-        updateTheme(config.nighttheme);
-      }
-    } else if (sunriseMoment.isBefore() && sunsetMoment.isAfter()) {
-      if (!manualShift || shiftMoment.isBefore(sunriseMoment)) {
-        updateTheme(config.daytheme);
-      }
-    } else if (sunsetMoment.isBefore()) {
-      if (!manualShift || shiftMoment.isBefore(sunsetMoment)) {
-        updateTheme(config.nighttheme);
-      }
+    if (sunriseMoment.isAfter() && !manualShifted) {
+      updateTheme(config.nighttheme);
+    } else if (
+      sunriseMoment.isBefore() &&
+      sunsetMoment.isAfter() &&
+      (!manualShift || shiftMoment.isBefore(sunriseMoment))
+    ) {
+      updateTheme(config.daytheme);
+    } else if (
+      sunsetMoment.isBefore() &&
+      (!manualShift || shiftMoment.isBefore(sunsetMoment))
+    ) {
+      updateTheme(config.nighttheme);
     }
   });
 }

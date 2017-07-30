@@ -25,12 +25,12 @@
                 "themeshift.sunset": {
                     "type": "string",
                     "default": "18:00",
-                    "description": "When the sun goes down"
+                    "description": "Time when the sun goes down (e.g. 20:00) or \"auto\""
                 },
                 "themeshift.sunrise": {
                     "type": "string",
                     "default": "07:00",
-                    "description": "When the sun comes up"
+                    "description": "Time when the sun comes up (e.g. 08:00) or \"auto\""
                 },
                 "themeshift.daytheme": {
                     "type": "string",
