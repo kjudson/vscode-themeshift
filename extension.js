@@ -2,7 +2,7 @@ const vscode = require("vscode");
 const moment = require("moment");
 const fetch = require("node-fetch");
 
-const updateFrequency = 60000;
+const updateFrequency = 1000;
 let config = {};
 let lastCoordinatesUpdate = 0;
 let realSunrise;
@@ -128,8 +128,8 @@ function getAndUpdateSunriseSunset() {
     return getCoordinates()
       .then(getSunriseSunsetFromWebService)
       .then(result => {
-        realSunrise = moment(result.sunrise, "hh:mm:ss A").format("HH:mm");
-        realSunset = moment(result.sunset, "hh:mm:ss A").format("HH:mm");
+        realSunrise = fromUtc(moment(result.sunrise, "hh:mm:ss A")).format("HH:mm");
+        realSunset = fromUtc(moment(result.sunset, "hh:mm:ss A")).format("HH:mm");
         return {
           sunrise: realSunrise,
           sunset: realSunset
@@ -168,4 +168,9 @@ function getSunriseSunsetFromWebService(coordinates) {
     .then(json => {
       return json.results;
     });
+}
+
+function fromUtc(time) {
+  const utcOffset = moment().utcOffset();
+  return time.add(utcOffset, "m");
 }
