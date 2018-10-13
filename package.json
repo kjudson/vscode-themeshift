@@ -60,16 +60,16 @@
         "test": "node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.0.3",
-        "vscode": "^1.0.0",
-        "mocha": "^2.3.3",
+        "@types/mocha": "^2.2.48",
+        "@types/node": "^6.14.0",
         "eslint": "^3.6.0",
-        "@types/node": "^6.0.40",
-        "@types/mocha": "^2.2.32"
+        "mocha": "^2.3.3",
+        "typescript": "^2.9.2",
+        "vscode": "^1.1.21"
     },
     "dependencies": {
-        "moment": "^2.18.1",
-        "node-fetch": "^1.7.1"
+        "moment": "^2.22.2",
+        "node-fetch": "^1.7.3"
     },
     "author": {
         "name": "Kevin Judson"
