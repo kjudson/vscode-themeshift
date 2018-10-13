@@ -2,7 +2,7 @@
     "name": "themeshift",
     "displayName": "ThemeShift",
     "description": "Schedule theme changes during the day.",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "publisher": "kjudson",
     "engines": {
         "vscode": "^1.14.0"
