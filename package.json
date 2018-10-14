@@ -2,7 +2,7 @@
     "name": "themeshift",
     "displayName": "ThemeShift",
     "description": "Schedule theme changes during the day.",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "kjudson",
     "license": "Apache-2.0",
     "engines": {
