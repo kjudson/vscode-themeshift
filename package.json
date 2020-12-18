@@ -70,7 +70,7 @@
     },
     "dependencies": {
         "moment": "^2.22.2",
-        "node-fetch": "^2.2.0"
+        "node-fetch": "^2.6.1"
     },
     "author": {
         "name": "Kevin Judson"
