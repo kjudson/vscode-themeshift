@@ -69,7 +69,7 @@
         "vscode": "^1.1.21"
     },
     "dependencies": {
-        "moment": "^2.22.2",
+        "moment": "^2.29.4",
         "node-fetch": "^2.6.1"
     },
     "author": {
